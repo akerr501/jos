@@ -12,7 +12,7 @@ def test_jos():
 
 @test(20, parent=test_jos)
 def test_printf():
-    r.match("6828 decimal is 15254 octal!")
+    r.match("444544 decimal is 1544200 octal!")
 
 BACKTRACE_RE = r"^ *ebp +f01[0-9a-z]{5} +eip +f0100[0-9a-z]{3} +args +([0-9a-z]+)"
 
