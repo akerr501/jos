@@ -17,3 +17,6 @@
 /myapi.key
 /.suf
 tags
+.gdb_history
+peda*.txt
+.*.swp
