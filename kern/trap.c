@@ -66,14 +66,26 @@ static const char *trapname(int trapno)
 }
 
 
+// XYZ: write a function declaration here...
+// e.g., void t_divide();
+
 void
 trap_init(void)
 {
 	extern struct Segdesc gdt[];
 
+    /*
+     *
+     * HINT
+     * Do something like this: SETGATE(idt[T_DIVIDE], 0, GD_KT, t_divide, 0);
+     * if your trap handler's name for divide by zero is t_device.
+     * Additionally, you should declare trap handler as a function
+     * to refer that in C code... (see the comment XYZ above)
+     *
+     */
 	// LAB 3: Your code here.
 
-	// Per-CPU setup 
+	// Per-CPU setup
 	trap_init_percpu();
 }
 
