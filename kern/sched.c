@@ -74,6 +74,7 @@ sched_halt(void)
 		"movl %0, %%esp\n"
 		"pushl $0\n"
 		"pushl $0\n"
+        // LAB 4:
 		// Uncomment the following line after completing exercise 13
 		//"sti\n"
 		"1:\n"
