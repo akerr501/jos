@@ -22,6 +22,7 @@ struct Command {
 	int (*func)(int argc, char** argv, struct Trapframe* tf);
 };
 
+// LAB 1: add your command to here...
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
@@ -58,7 +59,9 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	// Your code here.
+	// LAB 1: Your code here.
+    // HINT 1: use read_ebp().
+    // HINT 2: print the current ebp on the first line (not current_ebp[0])
 	return 0;
 }
 
