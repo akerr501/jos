@@ -16,7 +16,77 @@
 /sol?/
 /myapi.key
 /.suf
-tags
+
+# nfs
+.nfs*
+
+# Trash
+.Trash-*
+
+# Apple
+.DS_Store
+.AppleDouble
+.LSOverride
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+
+# gdb
 .gdb_history
 peda*.txt
+core
+
+# vim
 .*.swp
+
+# VS
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Session
+Session.vim
+Sessionx.vim
+
+# Temporary
+.netrwhist
+
+# Persistent undo
+[._]*.un~
+
+# Tags
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+GSYMS
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
