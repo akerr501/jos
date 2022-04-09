@@ -154,7 +154,7 @@ gdb:
 pre-qemu: .gdbinit
 
 qemu: $(IMAGES) pre-qemu
-	$(QEMU) $(QEMUOPTS)
+	$(QEMU) -nographic $(QEMUOPTS)
 
 qemu-nox: $(IMAGES) pre-qemu
 	@echo "***"
@@ -166,7 +166,7 @@ qemu-gdb: $(IMAGES) pre-qemu
 	@echo "***"
 	@echo "*** Now run 'gdb'." 1>&2
 	@echo "***"
-	$(QEMU) $(QEMUOPTS) -S
+	$(QEMU) -nographic $(QEMUOPTS) -S
 
 qemu-nox-gdb: $(IMAGES) pre-qemu
 	@echo "***"
