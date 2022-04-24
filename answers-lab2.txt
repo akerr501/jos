@@ -1,0 +1,25 @@
+Question 1: Since all pointers are virtual addresses in C, and x is being set to a char pointer, x should be uintptr_t type to represent the virtual address.
+
+Question 2:
+
+Entry   |   Virtual address   |   Points to
+1023    |   0xffc00000        |   Page table for top 4MB of phys memory
+1022    |   0xff800000        |   Page table for second to top of 4MB of phys memory
+--------|--------------------------------------------------------------------------------------
+960     |   0xf0000000        |   Page table for first 4MB of phys memory (KERNBASE, KSTACKTOP)
+959     |   0xefc00000        |   Page table for kernel stacks (MMIOLIM)
+958     |   0xef800000        |   Page table for Memory-mapped I/O (ULIM, MMIOBASE)
+957     |   0xef400000        |   Current Page table (UVPT)
+956     |   0xef000000        |   Page table for the addresses of pages (UPAGES)
+--------|--------------------------------------------------------------------------------------
+2       |   0x00800000        |   Program Data & Heap (UTEXT)
+1       |   0x00400000        |   Empty Memory (UTEMP)
+0       |   0x00000000        |   Empty Memory
+
+Question 3: User programs will not be able to read or write to kernel memory because the CPU will check the user permissions with the last two bits of the address in the page table and page directory to see if the user is allowed to perform the action. When this happens, a page fault is raised.
+
+Question 4: According to pmap.h, we have a maximum of 256MB of memory supported. This is because top of physical memory is at entry 1023, bottom of physical memory is at 960. 1023 - 960 = 63 (+1 for index 0 makes 64). 64 * 4mb = 256mb.
+
+Question 5: To cover the 256MB, we can use a page directory and with 1024 page entries. If a page directory is 4096, and each page entry is 1024, then 4096 + (1024 * 4096) = 4,198,400 which is about 4MB
+
+Question 6: We transition to running EIP above kernbase with the command on line 68 in entry.s "jmp	*%eax". We are able to continue running at a low EIP after enabling paging because we also mapped VA's [0, 4MB) to PA's [0, 4MB) in entrypgdir.c. We have to use an EIP above kernbase because we designed our kernel to expect a high address, it would fault if we didn't make this change.
