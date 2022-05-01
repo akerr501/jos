@@ -47,6 +47,8 @@
  * Lab 3: Your code here for generating entry points for the different traps.
  */
 
+/* all the entry points needed */
+
 TRAPHANDLER_NOEC(t_divide, T_DIVIDE); // 0
 TRAPHANDLER_NOEC(t_debug, T_DEBUG);   // 1
 TRAPHANDLER_NOEC(t_nmi, T_NMI);       // 2
@@ -87,14 +89,17 @@ TRAPHANDLER_NOEC(t_syscall, T_SYSCALL); // 48
  * Lab 3: Your code here for _alltraps
  */
  _alltraps:
+  /* push values to make the stack look like a struct Trapframe */
   pushl %ds
   pushl %es
   pushal
 
-  movl $GD_KD, %eax
+  /* load GD_KD into %ds and %es */
+  movl $GD_KD, %ax
   movw %ax, %ds
   movw %ax, %es
 
+  /* pushl %esp to pass a pointer to the Trapframe as an argument to trap() */
   pushl %esp
 
   call trap

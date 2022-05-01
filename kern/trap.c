@@ -83,6 +83,7 @@ void t_mchk();
 void t_simderr();
 
 void t_syscall();
+void t_default();
 
 void
 trap_init(void)
@@ -99,6 +100,7 @@ trap_init(void)
      *
      */
 	// LAB 3: Your code here.
+	// setting up idt
 	SETGATE(idt[T_DIVIDE], 0, GD_KT, t_divide, 0);
 	SETGATE(idt[T_DEBUG], 0, GD_KT, t_debug, 0);
 	SETGATE(idt[T_NMI], 0, GD_KT, t_nmi, 0);
@@ -124,7 +126,6 @@ trap_init(void)
 	SETGATE(idt[T_SIMDERR], 0, GD_KT, t_simderr, 0);
 
 	SETGATE(idt[T_SYSCALL], 0, GD_KT, t_syscall, 3); // must be available to ring 3
-
 	// Per-CPU setup
 	trap_init_percpu();
 }
@@ -225,6 +226,7 @@ trap_dispatch(struct Trapframe *tf)
 			tf->tf_regs.reg_eax = ret;
 			return;
 		}
+		default: break;
 	}
 
 	// Unexpected trap: The user process or the kernel has a bug.

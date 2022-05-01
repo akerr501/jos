@@ -168,9 +168,10 @@ mem_init(void)
 	//////////////////////////////////////////////////////////////////////
 	// Make 'envs' point to an array of size 'NENV' of 'struct Env'.
 	// LAB 3: Your code here.
+	// environment size is calculated by multiply the number of environments (NENV) times the size of the struct representing them
 	uint32_t envs_size = NENV * sizeof(struct Env);
-	envs = (struct Env *) boot_alloc(envs_size);
-	memset(envs,0,envs_size);
+	envs = (struct Env *) boot_alloc(envs_size); // allocate that much memory
+	memset(envs,0,envs_size); // set memory to zero before we do anything else
 
 	//////////////////////////////////////////////////////////////////////
 	// Now that we've allocated the initial kernel data structures, we set
@@ -207,6 +208,7 @@ mem_init(void)
 	//    - the new image at UENVS  -- kernel R, user R
 	//    - envs itself -- kernel RW, user NONE
 	// LAB 3: Your code here.
+	// map our envs array to UENVS, set the permissions to present and read only for the user and kernel
 	boot_map_region(kern_pgdir, UENVS, ROUNDUP(envs_size, PGSIZE), PADDR(envs), (PTE_U | PTE_P));
 
 	//////////////////////////////////////////////////////////////////////
@@ -592,15 +594,18 @@ int
 user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 {
 	// LAB 3: Your code here.
+	// need to round down the starting address and round up the ending address
 	uintptr_t addr_end = ROUNDUP((uintptr_t)va + len, PGSIZE);
 	for(uintptr_t addr = ROUNDDOWN((uintptr_t)va, PGSIZE); addr < addr_end; addr += PGSIZE){
-		pte_t *p_pte = pgdir_walk(env->env_pgdir,(void *)addr,0);
-		if(addr >= ULIM  || p_pte == NULL || (*p_pte&PTE_P) != PTE_P || (*p_pte&perm) != perm){
-			user_mem_check_addr = addr;
-			return -E_FAULT;
+		pte_t *p_pte = pgdir_walk(env->env_pgdir,(void *)addr,0); // get the page table entry so we can check permissions
+		if(addr >= ULIM  || p_pte == NULL || (*p_pte&PTE_P) != PTE_P || (*p_pte&perm) != perm){ // if addr is out of range, or null, or incorrect permissions
+			// get the invalid address and set user_mem_check_addr
+			if(addr < (uintptr_t)va) user_mem_check_addr = (uintptr_t)va; // need to check if addr is less than va because we rounded down
+			else user_mem_check_addr = addr;
+			return -E_FAULT; // return error value
 		}
 	}
-
+	// otherwise we were successful, yay
 	return 0;
 }
 
