@@ -26,9 +26,22 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
+	{ "backtrace", "Show the backtrace of the current kernel stack", mon_backtrace },
+	{ "show", "Shows some pretty colors!", show}
 };
 
 /***** Implementations of basic kernel monitor commands *****/
+
+int
+show()
+{
+	cprintf("\e[0;31m(ง'̀-'́)ง\n");
+	cprintf("\e[0;35m(ง'̀-'́)ง\n");
+	cprintf("\e[0;34m(ง'̀-'́)ง\n");
+	cprintf("\e[0;33m(ง'̀-'́)ง\n");
+	cprintf("\e[0;36m(ง'̀-'́)ง\n\e[0;37m");
+	return 0;
+}
 
 int
 mon_help(int argc, char **argv, struct Trapframe *tf)
@@ -59,9 +72,26 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	// LAB 1: Your code here.
-    // HINT 1: use read_ebp().
-    // HINT 2: print the current ebp on the first line (not current_ebp[0])
+
+	struct Eipdebuginfo debuginfo;
+
+	cprintf("Stack backtrace:\n");
+	uint32_t current_ebp = read_ebp();
+	uint32_t eip, arg;
+	uint32_t *ebpptr;
+	while (current_ebp > 0){
+		ebpptr = (uint32_t *) current_ebp;
+		eip = ebpptr[1];
+		cprintf("  ebp %x", current_ebp);
+		cprintf("  eip %x  args ", eip);
+		for (uint32_t i = 2; i <= 6; i++) cprintf("%08x ", ebpptr[i]);
+		cprintf("\n");
+
+		debuginfo_eip(eip, &debuginfo);
+		cprintf("\t%s:%d: ", debuginfo.eip_file, debuginfo.eip_line);
+		cprintf("%.*s+%d\n",  debuginfo.eip_fn_namelen, debuginfo.eip_fn_name, eip - debuginfo.eip_fn_addr);
+		current_ebp = *ebpptr;
+	}
 	return 0;
 }
 

@@ -1,0 +1,7 @@
+Question 1: Having a individual handler for each exception allows us to react differently for each exception, which wouldn't be possible if we only had one handler. There should be key differences between how we react to something like a system call versus a divide by zero exception
+
+Question 2: This should produce a vector 13 interrupt because 14 is reserved for kernel page faults, which the program does not have access to so we simply raise a 13 instead. If it raised a kernel page fault the program would end immediately.
+
+Question 3: The breakpoint would raise a general protection fault if it was set to be in Ring 0, instead of Ring 3 like how we set it up. This actually allows us to activate the monitor function in trap_dispatch
+
+Question 4: These protections are setup to prevent both malicious and incompetent actors from disrupting the kernel's operations.
