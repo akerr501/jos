@@ -296,6 +296,10 @@ mem_init_mp(void)
 	//
 	// LAB 4: Your code here:
 
+	// for each CPU i, map physical memory to their kernel stack. Grows downward
+	for(int i = 0; i < NCPU; i++){
+		boot_map_region(kern_pgdir, KSTACKTOP - KSTKSIZE - i * (KSTKSIZE + KSTKGAP), KSTKSIZE, PADDR(&percpu_kstacks[i]), (PTE_W | PTE_P));
+	}
 }
 
 // --------------------------------------------------------------
@@ -340,7 +344,7 @@ page_init(void)
 	for (i = 0; i < npages; i++) {
 		// find the current page address we're at. (ex. Page 0, 0 * PGSIZE = 0)
 		uint32_t addr = i * PGSIZE;
-		if(i == 0){ // if we are at the first page, mark as in use
+		if(i == 0 || addr == 0x7000){ // if we are at the first page or at MPENTRY_PADDR, mark as in use
 			pages[i].pp_ref = 1;
 			pages[i].pp_link = NULL;
 		}
@@ -638,7 +642,19 @@ mmio_map_region(physaddr_t pa, size_t size)
 	// Hint: The staff solution uses boot_map_region.
 	//
 	// Your code here:
-	panic("mmio_map_region not implemented");
+	physaddr_t pa_end = ROUNDUP((uintptr_t)pa + size, PGSIZE); // roundup our ending physical address
+	physaddr_t pa_start = ROUNDDOWN((uintptr_t)pa, PGSIZE); // rounddown our starting physical address
+	uintptr_t pa_offset = pa & 0xfff; // calculate the offset for the return value
+	uintptr_t va_start = base, old_base = base; // starting virtual address and old_base just equal base
+	uintptr_t new_base = va_start + pa_end - pa_start; // calculate the new base
+	size_t map_size = pa_end - pa_start; // caclulate the size we need to map
+	if(va_start + map_size > MMIOLIM) panic("attempted overflow of MMIO!");
+
+	// map memory using boot_map_region
+	boot_map_region(kern_pgdir, va_start, map_size, pa_start, (PTE_PCD|PTE_PWT|PTE_W));
+
+	base = new_base; // set the base to the new base
+	return (void*)(old_base + pa_offset); // return the old base + offset cause yeongjin said so
 }
 
 static uintptr_t user_mem_check_addr;

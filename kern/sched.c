@@ -29,6 +29,15 @@ sched_yield(void)
 	// below to halt the cpu.
 
 	// LAB 4: Your code here.
+	envid_t envid = (curenv==NULL?0:curenv->env_id); // if the current environment is null, set our id to zero. Otherwise read in curenv id
+
+	for(int i = 1; i <= NENV; i++){ // will check every environment in a circular loop, starting with the env following curenv
+		if(envs[(ENVX(envid) + i) % NENV].env_status == ENV_RUNNABLE) // checks if environment is runnable, runs if so
+			env_run(&envs[(ENVX(envid) + i) % NENV]); // this function won't return
+	}
+	if(curenv != NULL && curenv->env_status == ENV_RUNNING){ // we didn't find anything above, let's check previous env to see if we can run
+		env_run(curenv); // this function won't return
+	}
 
 	// sched_halt never returns
 	sched_halt();
@@ -76,10 +85,9 @@ sched_halt(void)
 		"pushl $0\n"
         // LAB 4:
 		// Uncomment the following line after completing exercise 13
-		//"sti\n"
+		"sti\n"
 		"1:\n"
 		"hlt\n"
 		"jmp 1b\n"
 	: : "a" (thiscpu->cpu_ts.ts_esp0));
 }
-

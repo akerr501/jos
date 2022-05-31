@@ -1,0 +1,7 @@
+Question 1: As described in comments, MPBOOTPHYS is used to calculate the absolute physical address of the symbol passed into the macro, so that we do not have to rely on the linker to fill things in. Things would go wrong for the loading the GDT since the linker can not fill in the GDT address.
+
+Question 2: We need a separate kernel stack for each CPU so that they can work independently of each other. If they shared resources like the kernel stack, they might accidentally edit memory on the stack or push values onto the stack interfering with each other.
+
+Question 3: Environment e is relative to the kernel address space, not the environment address space, so switching environments does not affect the context in which e is referenced by.
+
+Question 4: They are stored in the environment's trapframe object and are restored in env_run by the call to env_pop_tf(), they must be saved for later because when switching environments we will likely be editing the registers in the trapframe which values may need to be used when returning back to the environment.

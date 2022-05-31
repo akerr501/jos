@@ -25,11 +25,15 @@ void
 set_pgfault_handler(void (*handler)(struct UTrapframe *utf))
 {
 	int r;
+	envid_t envid = 0;
 
 	if (_pgfault_handler == 0) {
 		// First time through!
 		// LAB 4: Your code here.
-		panic("set_pgfault_handler not implemented");
+		r = sys_page_alloc(envid, (void *)(UXSTACKTOP - PGSIZE), (PTE_W | PTE_U | PTE_P)); // allocate a page at top of UXSTACKTOP
+		if(r < 0) panic("Failed to allocate a page for UXSTACKTOP!"); // check if that failed, panic attack time
+		r = sys_env_set_pgfault_upcall(envid, _pgfault_upcall); // set the page fault upcall for the environment
+		if(r < 0) panic("Failed to set up page fault upcall!"); // check if that failed, panic attack time
 	}
 
 	// Save handler pointer for assembly to call.
